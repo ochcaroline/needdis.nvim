@@ -222,8 +222,14 @@ M.render_todos = function()
 	end)
 
 	utils.set_keymap("n", "q", M.close_todos_window)
-	utils.set_keymap("n", config.options.keymaps.add_todo, actions.new_todo)
-	utils.set_keymap("n", config.options.keymaps.delete_todo, actions.delete_todo)
+	utils.set_keymap("n", config.options.keymaps.add_todo, function()
+		actions.new_todo()
+		M.render_todos()
+	end)
+	utils.set_keymap("n", config.options.keymaps.delete_todo, function()
+		actions.delete_todo()
+		M.render_todos()
+	end)
 
 	vim.keymap.set("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
 
@@ -233,7 +239,7 @@ M.render_todos = function()
 			foreach_float(function(_, float)
 				pcall(vim.api.nvim_win_close, float.win, true)
 			end)
-			items_with_details = nil
+			items_with_details = {}
 			api.nvim_buf_clear_namespace(state.floats.body.buf, M.namespace, 0, -1)
 		end,
 	})
