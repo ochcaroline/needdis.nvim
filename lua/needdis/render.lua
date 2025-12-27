@@ -7,7 +7,7 @@ local actions = require("needdis.actions")
 local utils = require("needdis.utils")
 local config = require("needdis.config")
 
-M.namespace = api.nvim_create_namespace("needdisns")
+M.namespace = api.nvim_create_namespace("needdis_ns")
 M.namespace_hl = api.nvim_create_namespace("needdis_hl")
 M.current_context = "global"
 
@@ -73,7 +73,7 @@ end
 ---@param item Todo
 ---@return string
 local title_line = function(item)
-	return string.format("%s %s", item.completed and "✓" or " ", item.title)
+	return string.format("%s %s", item.completed and config.options.icons.done or " ", item.title)
 end
 
 ---@param row integer
@@ -105,7 +105,7 @@ end
 ---@return string[]
 local desc_lines = function(desc)
 	if not desc or desc == "" then
-		return { "   <no description>" }
+		return { string.format("   %s", config.options.messages.no_description) }
 	end
 	local items = vim.split(desc, "\n", { trimempty = true })
 	for i, item in ipairs(items) do

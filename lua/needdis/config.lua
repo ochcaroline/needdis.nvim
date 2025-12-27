@@ -8,6 +8,15 @@ M.defaults = {
 		toggle_completed = "<leader>tv",
 		toggle_details = "<CR>",
 	},
+	icons = {
+		done = "✓",
+	},
+	messages = {
+		no_items = "<no items>",
+		no_description = "<no description>",
+		add_title = "Add TODO title: ",
+		add_description = "Add TODO description: ",
+	},
 }
 
 M.options = {}
