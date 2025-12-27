@@ -42,12 +42,12 @@ local toggle_todo = function(title)
 end
 
 M.new_todo = function()
-	vim.ui.input({ prompt = "Add TODO:" }, function(title)
+	vim.ui.input({ prompt = "Add TODO title: " }, function(title)
 		if not title or title == "" then
 			return
 		end
 
-		vim.ui.input({ prompt = "Add TODO description:" }, function(description)
+		vim.ui.input({ prompt = "Add TODO description: " }, function(description)
 			add_todo(title, description or "")
 		end)
 
