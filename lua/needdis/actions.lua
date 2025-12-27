@@ -24,6 +24,19 @@ local remove_todo = function(title)
 	end
 end
 
+local toggle_todo = function(title)
+	for i, todo in ipairs(state.todos) do
+		if utils.strip(title:gsub("✓", "")) == todo.title then
+			if state.todos[i].completed then
+				state.todos[i].completed = false
+			else
+				state.todos[i].completed = true
+			end
+			break
+		end
+	end
+end
+
 M.new_todo = function()
 	vim.ui.input({ prompt = "Add TODO:" }, function(input)
 		if not input or input == "" then
@@ -61,7 +74,10 @@ end
 
 M.toggle_todo = function()
 	local line_content = get_current_cursor_pos_line_content()
-	vim.notify(line_content)
+
+	toggle_todo(line_content)
+
+	file.save_todos()
 end
 
 return M

@@ -224,25 +224,19 @@ M.render_todos = function()
 		actions.delete_todo()
 		M.render_todos()
 	end)
-
-	vim.keymap.set("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
-
-	vim.api.nvim_create_autocmd("BufLeave", {
-		buffer = state.floats.body.buf,
-		callback = function()
-			foreach_float(function(_, float)
-				pcall(vim.api.nvim_win_close, float.win, true)
-			end)
-			items_with_details = {}
-			api.nvim_buf_clear_namespace(state.floats.body.buf, M.namespace, 0, -1)
-		end,
-	})
+	utils.set_keymap("n", config.options.keymaps.toggle_completed, function()
+		local cursor = api.nvim_win_get_cursor(state.floats.body.win)
+		actions.toggle_todo()
+		M.render_todos()
+		api.nvim_win_set_cursor(state.floats.body.win, cursor)
+	end)
+	utils.set_keymap("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
 end
 
 M.close_todos_window = function()
 	if M.is_todos_window_open() then
 		api.nvim_win_close(state.floats.body.win, true)
-
+		api.nvim_win_close(state.floats.header.win, true)
 		state.floats.body.buf = nil
 		state.floats.body.win = nil
 		state.floats.header.buf = nil

@@ -5,7 +5,7 @@ M.defaults = {
 	keymaps = {
 		add_todo = "<leader>ta",
 		delete_todo = "<leader>td",
-		mark_completed = "<leader>tv",
+		toggle_completed = "<leader>tv",
 		toggle_details = "<CR>",
 	},
 }
