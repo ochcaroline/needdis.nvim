@@ -240,7 +240,6 @@ M.render_todos = function()
 		vim.api.nvim_set_option_value("buftype", "nofile", { buf = float.buf })
 	end)
 
-	utils.set_keymap("n", "q", M.close_todos_window)
 	utils.set_keymap("n", config.options.keymaps.add_todo, function()
 		actions.new_todo()
 		M.render_todos()
