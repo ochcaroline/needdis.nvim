@@ -15,8 +15,6 @@ api.nvim_set_hl(0, "TodoDone", { fg = "#696969", strikethrough = true })
 api.nvim_set_hl(0, "TodoDescription", { fg = "#656565", italic = true })
 
 local items_with_details = {}
-local task_pattern = "[%s+✓+]"
-local task_done_pattern = "✓+%s+"
 
 local get_window_config = function()
 	local width = vim.o.columns
@@ -69,10 +67,6 @@ end
 
 local title_line = function(item)
 	return string.format("%s %s", item.completed and "✓" or " ", item.title)
-end
-
-local is_done_task = function(line)
-	return line:match(task_done_pattern)
 end
 
 local extmark_on_row = function(row)
@@ -201,7 +195,7 @@ M.render_todos = function()
 	end
 
 	for i, line in ipairs(lines) do
-		if line:match(task_pattern) then
+		if utils.is_task(line) then
 			local mark_id = api.nvim_buf_set_extmark(state.floats.body.buf, M.namespace, i - 1, 0, {})
 			local todo_idx = line_to_todo_idx[i]
 			items_with_details[mark_id] = {
@@ -210,7 +204,7 @@ M.render_todos = function()
 				shown = false,
 				end_mark = nil,
 			}
-			if is_done_task(line) then
+			if utils.is_done_task(line) then
 				vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDone", { i - 1, 0 }, { i - 1, -1 })
 			end
 		end
