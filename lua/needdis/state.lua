@@ -1,6 +1,6 @@
 local M = {
 	floats = {
-		title = {
+		header = {
 			buf = nil,
 			win = nil,
 		},
