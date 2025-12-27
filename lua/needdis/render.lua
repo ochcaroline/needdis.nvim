@@ -16,6 +16,7 @@ api.nvim_set_hl(0, "TodoDescription", { fg = "#656565", italic = true })
 
 local items_with_details = {}
 
+---@return { header: vim.api.keyset.win_config, body: vim.api.keyset.win_config }
 local get_window_config = function()
 	local width = vim.o.columns
 	local height = vim.o.lines
@@ -48,6 +49,9 @@ local get_window_config = function()
 	}
 end
 
+---@param cfg vim.api.keyset.win_config
+---@param enter boolean?
+---@return { buf: integer, win: integer }
 local create_window = function(cfg, enter)
 	if enter == nil then
 		enter = false
@@ -59,16 +63,21 @@ local create_window = function(cfg, enter)
 	return { buf = bufnr, win = win }
 end
 
+---@param cb function
 local foreach_float = function(cb)
 	for name, float in pairs(state.floats) do
 		cb(name, float)
 	end
 end
 
+---@param item Todo
+---@return string
 local title_line = function(item)
 	return string.format("%s %s", item.completed and "✓" or " ", item.title)
 end
 
+---@param row integer
+---@return integer|nil
 local extmark_on_row = function(row)
 	local marks = api.nvim_buf_get_extmarks(state.floats.body.buf, M.namespace, { row, 0 }, { row, 1 }, { limit = 1 })
 	if marks and marks[1] then
@@ -77,6 +86,8 @@ local extmark_on_row = function(row)
 	return nil
 end
 
+---@param mark_id integer
+---@return integer|nil
 local function extmark_row_by_id(mark_id)
 	if not mark_id then
 		return nil
@@ -90,6 +101,8 @@ local function extmark_row_by_id(mark_id)
 	return nil
 end
 
+---@param desc string
+---@return string[]
 local desc_lines = function(desc)
 	if not desc or desc == "" then
 		return { "   <no description>" }
@@ -256,6 +269,7 @@ M.close_todos_window = function()
 	end
 end
 
+---@return boolean
 M.is_todos_window_open = function()
 	if state.floats.body ~= nil and state.floats.body.win ~= nil and api.nvim_win_is_valid(state.floats.body.win) then
 		return true

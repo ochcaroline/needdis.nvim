@@ -6,15 +6,18 @@ local file = require("needdis.file")
 local state = require("needdis.state")
 local utils = require("needdis.utils")
 
-local add_todo = function(title)
+---@param title string
+---@param description string
+local add_todo = function(title, description)
 	local todo = {
 		title = title,
 		completed = false,
-		description = "",
+		description = description,
 	}
 	table.insert(state.todos, todo)
 end
 
+---@param title string
 local remove_todo = function(title)
 	for i, todo in ipairs(state.todos) do
 		if utils.strip(title) == todo.title then
@@ -24,6 +27,7 @@ local remove_todo = function(title)
 	end
 end
 
+---@param title string
 local toggle_todo = function(title)
 	for i, todo in ipairs(state.todos) do
 		if utils.strip(title:gsub("✓", "")) == todo.title then
@@ -38,12 +42,14 @@ local toggle_todo = function(title)
 end
 
 M.new_todo = function()
-	vim.ui.input({ prompt = "Add TODO:" }, function(input)
-		if not input or input == "" then
+	vim.ui.input({ prompt = "Add TODO:" }, function(title)
+		if not title or title == "" then
 			return
 		end
 
-		add_todo(input)
+		vim.ui.input({ prompt = "Add TODO description:" }, function(description)
+			add_todo(title, description or "")
+		end)
 
 		if M._winid and api.nvim_win_is_valid(M.state.floats.body.win) then
 			api.nvim_set_current_win(M.state.floats.body.win)
