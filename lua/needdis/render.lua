@@ -15,6 +15,7 @@ api.nvim_set_hl(0, "TodoDone", { fg = "#696969", strikethrough = true })
 api.nvim_set_hl(0, "TodoDescription", { fg = "#656565", italic = true })
 
 local items_with_details = {}
+local task_pattern = "[%s+✓+]"
 local task_done_pattern = "✓+%s+"
 
 local get_window_config = function()
@@ -73,6 +74,7 @@ end
 local is_done_task = function(line)
 	return line:match(task_done_pattern)
 end
+
 local extmark_on_row = function(row)
 	local marks = api.nvim_buf_get_extmarks(state.floats.body.buf, M.namespace, { row, 0 }, { row, 1 }, { limit = 1 })
 	if marks and marks[1] then
@@ -96,9 +98,14 @@ end
 
 local desc_lines = function(desc)
 	if not desc or desc == "" then
-		return { "<no description>" }
+		return { "   <no description>" }
 	end
-	return vim.split(desc, "\n", { trimempty = true })
+	local items = vim.split(desc, "\n", { trimempty = true })
+	for i, item in ipairs(items) do
+		items[i] = string.format("   %s", item)
+	end
+
+	return items
 end
 
 M.toggle_details_on_todo = function()
@@ -121,16 +128,18 @@ M.toggle_details_on_todo = function()
 		meta.end_mark = nil
 	else
 		local item = state.todos[meta.idx]
-		local item_desc = desc_lines(item.description)
+		if item ~= nil then
+			local item_desc = desc_lines(item.description)
 
-		api.nvim_buf_set_lines(state.floats.body.buf, row + 1, row + 1, false, item_desc)
-		for i = 1, #item_desc do
-			local r = row + i
-			vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDescription", { r, 0 }, { r, -1 })
+			api.nvim_buf_set_lines(state.floats.body.buf, row + 1, row + 1, false, item_desc)
+			for i = 1, #item_desc do
+				local r = row + i
+				vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDescription", { r, 0 }, { r, -1 })
+			end
+			local end_mark = api.nvim_buf_set_extmark(state.floats.body.buf, M.namespace, row + 1, 0, {})
+			meta.end_mark = end_mark
+			meta.shown = true
 		end
-		local end_mark = api.nvim_buf_set_extmark(state.floats.body.buf, M.namespace, row + 1, 0, {})
-		meta.end_mark = end_mark
-		meta.shown = true
 	end
 
 	vim.api.nvim_set_option_value("modifiable", false, { buf = state.floats.body.buf })
@@ -144,13 +153,30 @@ M.render_todos = function()
 	state.floats.body = create_window(windows_config.body, true)
 
 	local title_text = "TODO List"
-
 	local padding = string.rep(" ", (windows_config.header.width - #title_text) / 2)
 	local title = padding .. title_text
 
+	local incomplete, complete = {}, {}
+	for idx, t in ipairs(state.todos) do
+		if t.completed then
+			table.insert(complete, { item = t, idx = idx })
+		else
+			table.insert(incomplete, { item = t, idx = idx })
+		end
+	end
+
 	local lines = {}
-	for _, t in ipairs(state.todos) do
-		lines[#lines + 1] = title_line(t)
+	table.insert(lines, "TODO:")
+	for _, t in ipairs(incomplete) do
+		table.insert(lines, title_line(t.item))
+	end
+
+	table.insert(lines, "")
+	table.insert(lines, "")
+	table.insert(lines, "Completed:")
+
+	for _, t in ipairs(complete) do
+		table.insert(lines, title_line(t.item))
 	end
 
 	vim.api.nvim_set_option_value("modifiable", true, { buf = state.floats.body.buf })
@@ -158,16 +184,35 @@ M.render_todos = function()
 	vim.api.nvim_buf_set_lines(state.floats.header.buf, 0, -1, false, { title })
 	vim.api.nvim_buf_set_lines(state.floats.body.buf, 0, -1, false, lines)
 
+	local line_to_todo_idx = {}
+	local current_line = 1
+
+	current_line = current_line + 1 -- "TODO:" header
+	for _, t in ipairs(incomplete) do
+		line_to_todo_idx[current_line] = t.idx
+		current_line = current_line + 1
+	end
+
+	current_line = current_line + 2 -- line split
+	current_line = current_line + 1 -- "Completed" header
+	for _, t in ipairs(complete) do
+		line_to_todo_idx[current_line] = t.idx
+		current_line = current_line + 1
+	end
+
 	for i, line in ipairs(lines) do
-		local mark_id = api.nvim_buf_set_extmark(state.floats.body.buf, M.namespace, i - 1, 0, {})
-		items_with_details[mark_id] = {
-			idx = i,
-			text = utils.strip(line),
-			shown = false,
-			end_mark = nil,
-		}
-		if is_done_task(line) then
-			vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDone", { i - 1, 0 }, { i - 1, -1 })
+		if line:match(task_pattern) then
+			local mark_id = api.nvim_buf_set_extmark(state.floats.body.buf, M.namespace, i - 1, 0, {})
+			local todo_idx = line_to_todo_idx[i]
+			items_with_details[mark_id] = {
+				idx = todo_idx,
+				text = utils.strip(line),
+				shown = false,
+				end_mark = nil,
+			}
+			if is_done_task(line) then
+				vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDone", { i - 1, 0 }, { i - 1, -1 })
+			end
 		end
 	end
 
