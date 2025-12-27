@@ -161,16 +161,24 @@ M.render_todos = function()
 
 	local lines = {}
 	table.insert(lines, "TODO:")
-	for _, t in ipairs(incomplete) do
-		table.insert(lines, title_line(t.item))
+	if #incomplete > 0 then
+		for _, t in ipairs(incomplete) do
+			table.insert(lines, title_line(t.item))
+		end
+	else
+		table.insert(lines, "no items")
 	end
 
 	table.insert(lines, "")
 	table.insert(lines, "")
 	table.insert(lines, "Completed:")
 
-	for _, t in ipairs(complete) do
-		table.insert(lines, title_line(t.item))
+	if #complete > 0 then
+		for _, t in ipairs(complete) do
+			table.insert(lines, title_line(t.item))
+		end
+	else
+		table.insert(lines, "no items")
 	end
 
 	vim.api.nvim_set_option_value("modifiable", true, { buf = state.floats.body.buf })
@@ -207,6 +215,10 @@ M.render_todos = function()
 			if utils.is_done_task(line) then
 				vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDone", { i - 1, 0 }, { i - 1, -1 })
 			end
+		end
+
+		if utils.strip(line) == "no items" then
+			vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDescription", { i - 1, 0 }, { i - 1, -1 })
 		end
 	end
 
