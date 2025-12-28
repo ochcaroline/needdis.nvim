@@ -1,8 +1,10 @@
 # needdis.nvim
 
+Another neovim plugin that does tracking of your personal tasks.
+
 ## Reasoning
-I tried multiple apps for tracking my tasks - Microsoft ToDo, Obsidian etc. After trying them I decided it would be VERY GOOD IDEA to write a lua plugin on my own.
-This is because I do not want to switch programs to keep order of my tasks.
+I tried multiple apps for tracking my tasks - Microsoft ToDo, Obsidian etc. Every one of them needed me to leave the terminal and I do not want that. I want to be able to do it in program that I use the most - neovim.
+So I did nvim plugin to handle that for me.
 
 **ℹ️ Note**: This plugin is very opinionated, because it's designed to match what I need. PRs appreciated though
 
@@ -31,3 +33,32 @@ return { "ochcaroline/needdis.nvim" }
 | `<leader>tv` 	| Toggle task completion 	|
 | `<leader>tet`	| Change task title         |
 | `<leader>ted`	| Change task description   |
+
+## Configuration
+Default configuration:
+```lua
+{
+	save_path = vim.fn.stdpath("data") .. "/needdis.json",
+	keymaps = {
+		toggle_window = "<leader>at",
+		add_todo = "<leader>ta",
+		delete_todo = "<leader>td",
+		toggle_completed = "<leader>tv",
+		toggle_details = "<CR>",
+		edit_title = "<leader>tet",
+		edit_description = "<leader>ted",
+	},
+	icons = {
+		done = "✓",
+	},
+	messages = {
+		title = "TODO List",
+		no_items = "<no items>",
+		no_description = "<no description>",
+		new_title = "Add task title: ",
+		new_description = "Add task description: ",
+		edit_title = "Edited task title: ",
+		edit_description = "Edited task description: ",
+	},
+}
+```
