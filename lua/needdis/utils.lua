@@ -1,6 +1,7 @@
 local M = {}
 
 local state = require("needdis.state")
+local config = require("needdis.config")
 
 local task_pattern = "[%s+✓+]"
 local task_done_pattern = "✓+%s+"
@@ -25,8 +26,14 @@ M.set_keymap = function(mode, key, callback)
 end
 
 ---@param line string
+---@return boolean
 M.is_done_task = function(line)
 	return line:match(task_done_pattern)
 end
 
+---@param line string
+---@return string
+M.get_title_from_line = function(line)
+	return M.strip(line:gsub(config.options.icons.done, ""))
+end
 return M

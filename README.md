@@ -29,3 +29,5 @@ return { "ochcaroline/needdis.nvim" }
 | `<leader>ta` 	| Add task               	|
 | `<leader>td` 	| Delete task            	|
 | `<leader>tv` 	| Toggle task completion 	|
+| `<leader>tet`	| Change task title         |
+| `<leader>ted`	| Change task description   |
