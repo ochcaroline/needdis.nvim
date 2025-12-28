@@ -24,7 +24,8 @@ return { "ochcaroline/needdis.nvim" }
 
 ### TODO window keymaps
 | Keymap       	| Action                 	|
-|--------------	|------------------------	|
+|---------------|------------------------	|
+| `<CR>`    	| Toggle task details       |
 | `<leader>ta` 	| Add task               	|
 | `<leader>td` 	| Delete task            	|
 | `<leader>tv` 	| Toggle task completion 	|
