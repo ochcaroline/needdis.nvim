@@ -152,14 +152,30 @@ function M.toggle_details_on_todo()
 	vim.api.nvim_set_option_value("modifiable", false, { buf = state.floats.body.buf })
 end
 
+---@param existing { buf: integer, win: integer }
+---@param cfg vim.api.keyset.win_config
+---@param enter boolean?
+---@return { buf: integer, win: integer }
+local function ensure_window(existing, cfg, enter)
+	if existing and existing.win and vim.api.nvim_win_is_valid(existing.win) then
+		return existing
+	else
+		return create_window(cfg, enter)
+	end
+end
+
 function M.render_todos()
 	items_with_details = {}
 	local windows_config = get_window_config()
 
-	state.floats.header = create_window(windows_config.header)
-	state.floats.body = create_window(windows_config.body, true)
+	state.floats.header = ensure_window(state.floats.header, windows_config.header)
+	state.floats.body = ensure_window(state.floats.body, windows_config.body, true)
 
-	local title_text = "TODO List"
+	foreach_float(function(_, float)
+		vim.api.nvim_set_option_value("modifiable", true, { buf = float.buf })
+	end)
+
+	local title_text = config.options.messages.title
 	local padding = string.rep(" ", (windows_config.header.width - #title_text) / 2)
 	local title = padding .. title_text
 
@@ -193,8 +209,6 @@ function M.render_todos()
 	else
 		table.insert(lines, "no items")
 	end
-
-	vim.api.nvim_set_option_value("modifiable", true, { buf = state.floats.body.buf })
 
 	vim.api.nvim_buf_set_lines(state.floats.header.buf, 0, -1, false, { title })
 	vim.api.nvim_buf_set_lines(state.floats.body.buf, 0, -1, false, lines)
@@ -267,21 +281,21 @@ function M.render_todos()
 			foreach_float(function(_, float)
 				pcall(vim.api.nvim_win_close, float.win, true)
 			end)
-			items_with_details = {}
-			api.nvim_buf_clear_namespace(state.floats.body.buf, M.namespace, 0, -1)
 		end,
 	})
 end
 
 function M.close_todos_window()
-	if M.is_todos_window_open() then
+	if state.floats.body and state.floats.body.win and api.nvim_win_is_valid(state.floats.body.win) then
 		api.nvim_win_close(state.floats.body.win, true)
-		api.nvim_win_close(state.floats.header.win, true)
-		state.floats.body.buf = nil
-		state.floats.body.win = nil
-		state.floats.header.buf = nil
-		state.floats.header.win = nil
 	end
+	if state.floats.header and state.floats.header.win and api.nvim_win_is_valid(state.floats.header.win) then
+		api.nvim_win_close(state.floats.header.win, true)
+	end
+	state.floats.body.buf = nil
+	state.floats.body.win = nil
+	state.floats.header.buf = nil
+	state.floats.header.win = nil
 end
 
 ---@return boolean

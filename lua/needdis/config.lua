@@ -15,6 +15,7 @@ M.defaults = {
 		done = "✓",
 	},
 	messages = {
+		title = "TODO List",
 		no_items = "<no items>",
 		no_description = "<no description>",
 		new_title = "Add task title: ",
