@@ -255,6 +255,19 @@ M.render_todos = function()
 		api.nvim_win_set_cursor(state.floats.body.win, cursor)
 	end)
 	utils.set_keymap("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
+
+	vim.keymap.set("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
+
+	vim.api.nvim_create_autocmd("BufLeave", {
+		buffer = state.floats.body.buf,
+		callback = function()
+			foreach_float(function(_, float)
+				pcall(vim.api.nvim_win_close, float.win, true)
+			end)
+			items_with_details = {}
+			api.nvim_buf_clear_namespace(state.floats.body.buf, M.namespace, 0, -1)
+		end,
+	})
 end
 
 M.close_todos_window = function()
