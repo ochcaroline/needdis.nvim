@@ -4,7 +4,7 @@ local config = require("needdis.config")
 local file = require("needdis.file")
 local render = require("needdis.render")
 
-M.setup = function(opts)
+function M.setup(opts)
 	config.setup(opts)
 	file.load_todos()
 

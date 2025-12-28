@@ -3,7 +3,7 @@ local M = {}
 local config = require("needdis.config")
 local state = require("needdis.state")
 
-M.save_todos = function()
+function M.save_todos()
 	local save_path = config.options.save_path
 	local file = io.open(save_path, "w")
 
@@ -13,7 +13,7 @@ M.save_todos = function()
 	end
 end
 
-M.load_todos = function()
+function M.load_todos()
 	local save_path = config.options.save_path
 	local file = io.open(save_path, "r")
 	if file then

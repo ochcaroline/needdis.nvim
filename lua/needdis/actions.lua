@@ -8,7 +8,7 @@ local utils = require("needdis.utils")
 local config = require("needdis.config")
 
 ---@param fn function
-local with_render = function(fn)
+local function with_render(fn)
 	fn()
 
 	-- this is so that we don't have circular dependency
@@ -16,7 +16,7 @@ local with_render = function(fn)
 end
 
 ---@param fn function
-M.action_after_set_cursor = function(fn)
+function M.action_after_set_cursor(fn)
 	local cursor = api.nvim_win_get_cursor(state.floats.body.win)
 	fn()
 	api.nvim_win_set_cursor(state.floats.body.win, cursor)
@@ -24,7 +24,7 @@ end
 
 ---@param title string
 ---@param description string
-local add_todo = function(title, description)
+local function add_todo(title, description)
 	local todo = {
 		title = title,
 		completed = false,
@@ -34,7 +34,7 @@ local add_todo = function(title, description)
 end
 
 ---@param line string
-local remove_todo = function(line)
+local function remove_todo(line)
 	for i, todo in ipairs(state.todos) do
 		if utils.get_title_from_line(line) == todo.title then
 			table.remove(state.todos, i)
@@ -44,7 +44,7 @@ local remove_todo = function(line)
 end
 
 ---@param line string
-local toggle_todo = function(line)
+local function toggle_todo(line)
 	for i, todo in ipairs(state.todos) do
 		if utils.get_title_from_line(line) == todo.title then
 			if state.todos[i].completed then
@@ -59,7 +59,7 @@ end
 
 ---@param line string
 ---@param new_title string
-local edit_todo_title = function(line, new_title)
+local function edit_todo_title(line, new_title)
 	for i, todo in ipairs(state.todos) do
 		if utils.get_title_from_line(line) == todo.title then
 			state.todos[i].title = new_title
@@ -70,7 +70,7 @@ end
 
 ---@param line string
 ---@param new_desc string
-local edit_todo_description = function(line, new_desc)
+local function edit_todo_description(line, new_desc)
 	for i, todo in ipairs(state.todos) do
 		if utils.get_title_from_line(line) == todo.title then
 			if new_desc == nil then
@@ -83,7 +83,7 @@ local edit_todo_description = function(line, new_desc)
 	end
 end
 
-M.new_todo = function()
+function M.new_todo()
 	with_render(function()
 		vim.ui.input({ prompt = config.options.messages.new_title }, function(title)
 			if not title or title == "" then
@@ -107,14 +107,14 @@ M.new_todo = function()
 	end)
 end
 
-local get_current_cursor_pos_line_content = function()
+local function get_current_cursor_pos_line_content()
 	local cursor = api.nvim_win_get_cursor(state.floats.body.win)
 	local todo_index = cursor[1] - 1
 	local line_content = api.nvim_buf_get_lines(state.floats.body.buf, todo_index, todo_index + 1, false)[1]
 	return line_content
 end
 
-M.delete_todo = function()
+function M.delete_todo()
 	with_render(function()
 		local line_content = get_current_cursor_pos_line_content()
 		remove_todo(line_content)
@@ -122,7 +122,7 @@ M.delete_todo = function()
 	end)
 end
 
-M.toggle_todo = function()
+function M.toggle_todo()
 	with_render(function()
 		local line_content = get_current_cursor_pos_line_content()
 		toggle_todo(line_content)
@@ -130,7 +130,7 @@ M.toggle_todo = function()
 	end)
 end
 
-M.edit_title = function()
+function M.edit_title()
 	with_render(function()
 		local line = get_current_cursor_pos_line_content()
 		vim.ui.input(
@@ -146,7 +146,7 @@ M.edit_title = function()
 	end)
 end
 
-M.edit_description = function()
+function M.edit_description()
 	with_render(function()
 		local line = get_current_cursor_pos_line_content()
 		vim.ui.input({ prompt = config.options.messages.edit_description }, function(input)

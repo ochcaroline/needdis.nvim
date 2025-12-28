@@ -17,7 +17,7 @@ api.nvim_set_hl(0, "TodoDescription", { fg = "#656565", italic = true })
 local items_with_details = {}
 
 ---@return { header: vim.api.keyset.win_config, body: vim.api.keyset.win_config }
-local get_window_config = function()
+local function get_window_config()
 	local width = vim.o.columns
 	local height = vim.o.lines
 
@@ -52,7 +52,7 @@ end
 ---@param cfg vim.api.keyset.win_config
 ---@param enter boolean?
 ---@return { buf: integer, win: integer }
-local create_window = function(cfg, enter)
+local function create_window(cfg, enter)
 	if enter == nil then
 		enter = false
 	end
@@ -64,7 +64,7 @@ local create_window = function(cfg, enter)
 end
 
 ---@param cb function
-local foreach_float = function(cb)
+local function foreach_float(cb)
 	for name, float in pairs(state.floats) do
 		cb(name, float)
 	end
@@ -72,13 +72,13 @@ end
 
 ---@param item Todo
 ---@return string
-local title_line = function(item)
+local function title_line(item)
 	return string.format("%s %s", item.completed and config.options.icons.done or " ", item.title)
 end
 
 ---@param row integer
 ---@return integer|nil
-local extmark_on_row = function(row)
+local function extmark_on_row(row)
 	local marks = api.nvim_buf_get_extmarks(state.floats.body.buf, M.namespace, { row, 0 }, { row, 1 }, { limit = 1 })
 	if marks and marks[1] then
 		return marks[1][1]
@@ -103,7 +103,7 @@ end
 
 ---@param desc string
 ---@return string[]
-local desc_lines = function(desc)
+local function desc_lines(desc)
 	if not desc or desc == "" then
 		return { string.format("   %s", config.options.messages.no_description) }
 	end
@@ -115,7 +115,7 @@ local desc_lines = function(desc)
 	return items
 end
 
-M.toggle_details_on_todo = function()
+function M.toggle_details_on_todo()
 	local row = api.nvim_win_get_cursor(state.floats.body.win)[1] - 1
 	local id = extmark_on_row(row)
 	local meta = items_with_details and items_with_details[id]
@@ -152,7 +152,7 @@ M.toggle_details_on_todo = function()
 	vim.api.nvim_set_option_value("modifiable", false, { buf = state.floats.body.buf })
 end
 
-M.render_todos = function()
+function M.render_todos()
 	items_with_details = {}
 	local windows_config = get_window_config()
 
@@ -273,7 +273,7 @@ M.render_todos = function()
 	})
 end
 
-M.close_todos_window = function()
+function M.close_todos_window()
 	if M.is_todos_window_open() then
 		api.nvim_win_close(state.floats.body.win, true)
 		api.nvim_win_close(state.floats.header.win, true)
@@ -285,7 +285,7 @@ M.close_todos_window = function()
 end
 
 ---@return boolean
-M.is_todos_window_open = function()
+function M.is_todos_window_open()
 	if state.floats.body ~= nil and state.floats.body.win ~= nil and api.nvim_win_is_valid(state.floats.body.win) then
 		return true
 	end
@@ -293,7 +293,7 @@ M.is_todos_window_open = function()
 	return false
 end
 
-M.toggle_todos = function()
+function M.toggle_todos()
 	if M.is_todos_window_open() then
 		M.close_todos_window()
 	else
