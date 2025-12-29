@@ -16,6 +16,8 @@ M.defaults = {
 	},
 	messages = {
 		title = "TODO List",
+		todo_status_header = "TODO:",
+		completed_status_header = "Completed:",
 		no_items = "<no items>",
 		no_description = "<no description>",
 		new_title = "Add task title: ",

@@ -11,8 +11,10 @@ M.namespace = api.nvim_create_namespace("needdis_ns")
 M.namespace_hl = api.nvim_create_namespace("needdis_hl")
 M.current_context = "global"
 
-api.nvim_set_hl(0, "TodoDone", { fg = "#696969", strikethrough = true })
-api.nvim_set_hl(0, "TodoDescription", { fg = "#656565", italic = true })
+local hl_name_done = "TodoDone"
+local hl_name_description = "TodoDescription"
+api.nvim_set_hl(0, hl_name_done, { fg = "#696969", strikethrough = true })
+api.nvim_set_hl(0, hl_name_description, { fg = "#656565", italic = true })
 
 local items_with_details = {}
 
@@ -141,7 +143,7 @@ function M.toggle_details_on_todo()
 			api.nvim_buf_set_lines(state.floats.body.buf, row + 1, row + 1, false, item_desc)
 			for i = 1, #item_desc do
 				local r = row + i
-				vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDescription", { r, 0 }, { r, -1 })
+				vim.hl.range(state.floats.body.buf, M.namespace_hl, hl_name_description, { r, 0 }, { r, -1 })
 			end
 			local end_mark = api.nvim_buf_set_extmark(state.floats.body.buf, M.namespace, row + 1, 0, {})
 			meta.end_mark = end_mark
@@ -189,7 +191,7 @@ function M.render_todos()
 	end
 
 	local lines = {}
-	table.insert(lines, "TODO:")
+	table.insert(lines, config.options.messages.todo_status_header)
 	if #incomplete > 0 then
 		for _, t in ipairs(incomplete) do
 			table.insert(lines, title_line(t.item))
@@ -200,7 +202,7 @@ function M.render_todos()
 
 	table.insert(lines, "")
 	table.insert(lines, "")
-	table.insert(lines, "Completed:")
+	table.insert(lines, config.options.messages.completed_status_header)
 
 	if #complete > 0 then
 		for _, t in ipairs(complete) do
@@ -240,12 +242,12 @@ function M.render_todos()
 				end_mark = nil,
 			}
 			if utils.is_done_task(line) then
-				vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDone", { i - 1, 0 }, { i - 1, -1 })
+				vim.hl.range(state.floats.body.buf, M.namespace_hl, hl_name_done, { i - 1, 0 }, { i - 1, -1 })
 			end
 		end
 
 		if utils.strip(line) == "no items" then
-			vim.hl.range(state.floats.body.buf, M.namespace_hl, "TodoDescription", { i - 1, 0 }, { i - 1, -1 })
+			vim.hl.range(state.floats.body.buf, M.namespace_hl, hl_name_description, { i - 1, 0 }, { i - 1, -1 })
 		end
 	end
 
