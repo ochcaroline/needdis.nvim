@@ -3,10 +3,11 @@ local M = {}
 local state = require("needdis.state")
 local config = require("needdis.config")
 
-local task_pattern = "[%s+✓+]"
+local task_pattern = "^[%s+✓+]"
 local task_done_pattern = "✓+%s+"
 
 ---@param title string
+---@return boolean
 function M.is_task(title)
 	return title:match(task_pattern)
 end
