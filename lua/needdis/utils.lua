@@ -9,7 +9,7 @@ local task_done_pattern = "✓+%s+"
 ---@param title string
 ---@return boolean
 function M.is_task(title)
-	return title:match(task_pattern)
+	return title:match(task_pattern) ~= nil
 end
 
 ---@param str string
@@ -29,7 +29,7 @@ end
 ---@param line string
 ---@return boolean
 function M.is_done_task(line)
-	return line:match(task_done_pattern)
+	return line:match(task_done_pattern) ~= nil
 end
 
 ---@param line string
