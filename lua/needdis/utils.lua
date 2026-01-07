@@ -23,6 +23,7 @@ end
 function M.set_keymap(mode, key, callback)
 	vim.keymap.set(mode, key, callback, {
 		buffer = state.floats.body.buf,
+		noremap = true,
 	})
 end
 
