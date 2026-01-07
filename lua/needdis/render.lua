@@ -187,6 +187,8 @@ local function setup_keymaps()
 	end)
 	utils.set_keymap("n", config.options.keymaps.move_to_top, actions.move_to_top)
 	utils.set_keymap("n", config.options.keymaps.move_to_bottom, actions.move_to_bottom)
+	utils.set_keymap("n", config.options.keymaps.move_task_down, actions.move_todo_down)
+	utils.set_keymap("n", config.options.keymaps.move_task_up, actions.move_todo_up)
 
 	vim.keymap.set("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
 end

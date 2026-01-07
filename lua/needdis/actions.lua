@@ -186,9 +186,40 @@ function M.edit_description()
 	end)
 end
 
+---@param todo_idx integer
+---@return boolean
+local function is_completed(todo_idx)
+	if state.todos[todo_idx].completed then
+		vim.notify("Moving completed items is not possible", vim.log.levels.INFO)
+		return true
+	end
+	return false
+end
+
+local function move_cursor_to_task(todo_idx)
+	if state.floats.body.win and api.nvim_win_is_valid(state.floats.body.win) then
+		local render = require("needdis.render")
+
+		local items = render.get_items_with_details()
+		for mark_id, details in pairs(items) do
+			if details.idx == todo_idx then
+				local marks = api.nvim_buf_get_extmarks(state.floats.body.buf, render.namespace, mark_id, mark_id, {})
+				if marks[1] then
+					local row = marks[1][2]
+					api.nvim_win_set_cursor(state.floats.body.win, { row + 1, 0 })
+				end
+			end
+		end
+	end
+end
+
 function M.move_to_top()
 	local todo_idx = safe_get_todo_idx()
 	if todo_idx == nil then
+		return
+	end
+
+	if is_completed(todo_idx) then
 		return
 	end
 
@@ -203,15 +234,17 @@ function M.move_to_top()
 	end)
 
 	vim.schedule(function()
-		if state.floats.body.win and api.nvim_win_is_valid(state.floats.body.win) then
-			api.nvim_win_set_cursor(state.floats.body.win, { 2, 0 })
-		end
+		move_cursor_to_task(todo_idx)
 	end)
 end
 
 function M.move_to_bottom()
 	local todo_idx = safe_get_todo_idx()
 	if todo_idx == nil then
+		return
+	end
+
+	if is_completed(todo_idx) then
 		return
 	end
 
@@ -227,23 +260,50 @@ function M.move_to_bottom()
 	end)
 
 	vim.schedule(function()
-		if state.floats.body.win and api.nvim_win_is_valid(state.floats.body.win) then
-			local render = require("needdis.render")
-
-			local last_idx = #state.todos
-			local items = render.get_items_with_details()
-			for mark_id, details in pairs(items) do
-				if details.idx == last_idx then
-					local marks =
-						api.nvim_buf_get_extmarks(state.floats.body.buf, render.namespace, mark_id, mark_id, {})
-					if marks[1] then
-						local row = marks[1][2]
-						api.nvim_win_set_cursor(state.floats.body.win, { row + 1, 0 })
-					end
-				end
-			end
-		end
+		move_cursor_to_task(todo_idx)
 	end)
 end
 
+function M.move_todo_up()
+	local todo_idx = safe_get_todo_idx()
+	if todo_idx == nil then
+		return
+	end
+
+	if is_completed(todo_idx) then
+		return
+	end
+	with_render(function()
+		local todo = table.remove(state.todos, todo_idx)
+		table.insert(state.todos, todo_idx - 1, todo)
+
+		file.save_todos()
+	end)
+
+	vim.schedule(function()
+		move_cursor_to_task(todo_idx - 1)
+	end)
+end
+
+function M.move_todo_down()
+	local todo_idx = safe_get_todo_idx()
+	if todo_idx == nil then
+		return
+	end
+
+	if is_completed(todo_idx) then
+		return
+	end
+
+	with_render(function()
+		local todo = table.remove(state.todos, todo_idx)
+		table.insert(state.todos, todo_idx + 1, todo)
+
+		file.save_todos()
+	end)
+
+	vim.schedule(function()
+		move_cursor_to_task(todo_idx + 1)
+	end)
+end
 return M

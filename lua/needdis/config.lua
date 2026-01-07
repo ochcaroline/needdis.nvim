@@ -12,6 +12,8 @@ M.defaults = {
 		edit_description = "<leader>ted",
 		move_to_top = "<leader>tt",
 		move_to_bottom = "<leader>tb",
+		move_task_up = "<leader>tk",
+		move_task_down = "<leader>tj",
 	},
 	icons = {
 		done = "✓",

@@ -29,16 +29,18 @@ return { "ochcaroline/needdis.nvim" }
 
 ### TODO window keymaps
 
-| Keymap        | Action                  |
-| ------------- | ----------------------- |
-| `<CR>`        | Toggle task details     |
-| `<leader>ta`  | Add task                |
-| `<leader>td`  | Delete task             |
-| `<leader>tv`  | Toggle task completion  |
-| `<leader>tet` | Change task title       |
-| `<leader>ted` | Change task description |
-| `<leader>tt`  | Move task to top        |
-| `<leader>tb`  | Move task to bottom     |
+| Keymap        | Action                      |
+| ------------- | --------------------------- |
+| `<CR>`        | Toggle task details         |
+| `<leader>ta`  | Add task                    |
+| `<leader>td`  | Delete task                 |
+| `<leader>tv`  | Toggle task completion      |
+| `<leader>tet` | Change task title           |
+| `<leader>ted` | Change task description     |
+| `<leader>tt`  | Move task to top            |
+| `<leader>tb`  | Move task to bottom         |
+| `<leader>tk`  | Move task one position up   |
+| `<leader>tj`  | Move task one position down |
 
 ## Configuration
 
@@ -57,6 +59,8 @@ Default configuration:
 		edit_description = "<leader>ted",
 		move_to_top = "<leader>tt",
 		move_to_bottom = "<leader>tb",
+		move_task_up = "<leader>tk",
+		move_task_down = "<leader>tj",
 	},
 	icons = {
 		done = "✓",
