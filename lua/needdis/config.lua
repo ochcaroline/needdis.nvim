@@ -18,6 +18,9 @@ M.defaults = {
 	icons = {
 		done = "✓",
 	},
+	window = {
+		window_width = 0.8,
+	},
 	messages = {
 		title = "TODO List",
 		todo_status_header = "TODO:",

@@ -23,7 +23,7 @@ local function get_window_config()
 	local width = vim.o.columns
 	local height = vim.o.lines
 
-	local window_width = 100
+	local window_width = math.ceil(vim.o.columns * config.options.window.window_width)
 	local header_height = 1 + 2 -- 1 + border
 	local body_height = height - header_height - 2 - 1 - 10
 

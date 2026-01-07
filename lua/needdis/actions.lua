@@ -4,7 +4,6 @@ local api = vim.api
 
 local file = require("needdis.file")
 local state = require("needdis.state")
-local utils = require("needdis.utils")
 local config = require("needdis.config")
 
 ---@param fn function
@@ -234,7 +233,9 @@ function M.move_to_top()
 	end)
 
 	vim.schedule(function()
-		move_cursor_to_task(todo_idx)
+		if state.floats.body.win and api.nvim_win_is_valid(state.floats.body.win) then
+			api.nvim_win_set_cursor(state.floats.body.win, { 2, 0 })
+		end
 	end)
 end
 
@@ -260,7 +261,21 @@ function M.move_to_bottom()
 	end)
 
 	vim.schedule(function()
-		move_cursor_to_task(todo_idx)
+		if state.floats.body.win and api.nvim_win_is_valid(state.floats.body.win) then
+			local render = require("needdis.render")
+			local last_idx = #state.todos
+			local items = render.get_items_with_details()
+			for mark_id, details in pairs(items) do
+				if details.idx == last_idx then
+					local marks =
+						api.nvim_buf_get_extmarks(state.floats.body.buf, render.namespace, mark_id, mark_id, {})
+					if marks[1] then
+						local row = marks[1][2]
+						api.nvim_win_set_cursor(state.floats.body.win, { row + 1, 0 })
+					end
+				end
+			end
+		end
 	end)
 end
 
