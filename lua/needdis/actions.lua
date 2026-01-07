@@ -109,13 +109,6 @@ local function get_todo_idx_at_cursor()
 	end
 end
 
-local function get_current_cursor_pos_line_content()
-	local cursor = api.nvim_win_get_cursor(state.floats.body.win)
-	local todo_index = cursor[1] - 1
-	local line_content = api.nvim_buf_get_lines(state.floats.body.buf, todo_index, todo_index + 1, false)[1]
-	return line_content
-end
-
 ---@return integer|nil
 local function safe_get_todo_idx()
 	local todo_idx = get_todo_idx_at_cursor()

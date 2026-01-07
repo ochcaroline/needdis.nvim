@@ -20,6 +20,12 @@ M.defaults = {
 	},
 	window = {
 		window_width = 0.8,
+		header = {
+			border = "rounded",
+		},
+		body = {
+			border = "rounded",
+		},
 	},
 	messages = {
 		title = "TODO List",
