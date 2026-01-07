@@ -317,4 +317,9 @@ function M.toggle_todos()
 	end
 end
 
+---@return table
+function M.get_items_with_details()
+	return items_with_details
+end
+
 return M

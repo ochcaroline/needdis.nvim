@@ -33,53 +33,33 @@ local function add_todo(title, description)
 	table.insert(state.todos, todo)
 end
 
----@param line string
-local function remove_todo(line)
-	for i, todo in ipairs(state.todos) do
-		if utils.get_title_from_line(line) == todo.title then
-			table.remove(state.todos, i)
-			break
-		end
+---@param todo_idx integer
+local function remove_todo(todo_idx)
+	if todo_idx and state.todos[todo_idx] then
+		table.remove(state.todos, todo_idx)
 	end
 end
 
----@param line string
-local function toggle_todo(line)
-	for i, todo in ipairs(state.todos) do
-		if utils.get_title_from_line(line) == todo.title then
-			if state.todos[i].completed then
-				state.todos[i].completed = false
-			else
-				state.todos[i].completed = true
-			end
-			break
-		end
+---@param todo_idx integer
+local function toggle_todo(todo_idx)
+	if todo_idx and state.todos[todo_idx] then
+		state.todos[todo_idx].completed = not state.todos[todo_idx].completed
 	end
 end
 
----@param line string
+---@param todo_idx integer
 ---@param new_title string
-local function edit_todo_title(line, new_title)
-	for i, todo in ipairs(state.todos) do
-		if utils.get_title_from_line(line) == todo.title then
-			state.todos[i].title = new_title
-			break
-		end
+local function edit_todo_title(todo_idx, new_title)
+	if todo_idx and state.todos[todo_idx] then
+		state.todos[todo_idx].title = new_title
 	end
 end
 
----@param line string
+---@param todo_idx integer
 ---@param new_desc string
-local function edit_todo_description(line, new_desc)
-	for i, todo in ipairs(state.todos) do
-		if utils.get_title_from_line(line) == todo.title then
-			if new_desc == nil then
-				new_desc = ""
-			end
-
-			state.todos[i].description = new_desc
-			break
-		end
+local function edit_todo_description(todo_idx, new_desc)
+	if todo_idx and state.todos[todo_idx] then
+		state.todos[todo_idx].description = new_desc
 	end
 end
 
@@ -107,6 +87,29 @@ function M.new_todo()
 	end)
 end
 
+---@return integer|nil
+local function get_todo_idx_at_cursor()
+	local cursor = api.nvim_win_get_cursor(state.floats.body.win)
+	local row = cursor[1] - 1
+
+	local render = require("needdis.render")
+	local marks = api.nvim_buf_get_extmarks(
+		state.floats.body.buf,
+		render.namespace,
+		{ row, 0 },
+		{ row, -1 },
+		{ limit = 1 }
+	)
+
+	if marks and marks[1] then
+		local mark_id = marks[1][1]
+		local items_with_details = render.get_items_with_details()
+		if items_with_details and items_with_details[mark_id] then
+			return items_with_details[mark_id].idx
+		end
+	end
+end
+
 local function get_current_cursor_pos_line_content()
 	local cursor = api.nvim_win_get_cursor(state.floats.body.win)
 	local todo_index = cursor[1] - 1
@@ -114,43 +117,71 @@ local function get_current_cursor_pos_line_content()
 	return line_content
 end
 
+---@return integer|nil
+local function safe_get_todo_idx()
+	local todo_idx = get_todo_idx_at_cursor()
+	if not todo_idx then
+		vim.notify("No todo item at cursor", vim.log.levels.WARN)
+		return
+	end
+	return todo_idx
+end
+
 function M.delete_todo()
 	with_render(function()
-		local line_content = get_current_cursor_pos_line_content()
-		remove_todo(line_content)
+		local todo_idx = safe_get_todo_idx()
+		if todo_idx == nil then
+			return
+		end
+
+		remove_todo(todo_idx)
 		file.save_todos()
 	end)
 end
 
 function M.toggle_todo()
 	with_render(function()
-		local line_content = get_current_cursor_pos_line_content()
-		toggle_todo(line_content)
+		local todo_idx = safe_get_todo_idx()
+		if todo_idx == nil then
+			return
+		end
+
+		toggle_todo(todo_idx)
 		file.save_todos()
 	end)
 end
 
 function M.edit_title()
-	with_render(function()
-		local line = get_current_cursor_pos_line_content()
-		vim.ui.input(
-			{ prompt = config.options.messages.edit_title, default = utils.get_title_from_line(line) },
-			function(input)
-				if not input or input == "" then
-					vim.notify("Title cannot be empty!", vim.log.levels.WARN)
-					return
-				end
-				edit_todo_title(line, input)
-			end
-		)
+	local todo_idx = safe_get_todo_idx()
+	if todo_idx == nil then
+		return
+	end
+
+	local current_title = state.todos[todo_idx].title
+	vim.ui.input({ prompt = config.options.messages.edit_title, default = current_title }, function(input)
+		if input == nil then
+			return
+		end
+
+		with_render(function()
+			edit_todo_title(todo_idx, input)
+		end)
 	end)
 end
 
 function M.edit_description()
-	with_render(function()
-		local line = get_current_cursor_pos_line_content()
-		vim.ui.input({ prompt = config.options.messages.edit_description }, function(input)
-			edit_todo_description(line, input)
+	local todo_idx = safe_get_todo_idx()
+	if todo_idx == nil then
+		return
+	end
+
+	vim.ui.input({ prompt = config.options.messages.edit_description }, function(input)
+		if input == nil then
+			return
+		end
+
+		with_render(function()
+			edit_todo_description(todo_idx, input)
 		end)
 	end)
 end
