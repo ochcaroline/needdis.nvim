@@ -186,4 +186,64 @@ function M.edit_description()
 	end)
 end
 
+function M.move_to_top()
+	local todo_idx = safe_get_todo_idx()
+	if todo_idx == nil then
+		return
+	end
+
+	if todo_idx == 1 then
+		vim.notify("Task is already at the top!", vim.log.levels.INFO)
+	end
+
+	with_render(function()
+		local todo = table.remove(state.todos, todo_idx)
+		table.insert(state.todos, 1, todo)
+		file.save_todos()
+	end)
+
+	vim.schedule(function()
+		if state.floats.body.win and api.nvim_win_is_valid(state.floats.body.win) then
+			api.nvim_win_set_cursor(state.floats.body.win, { 2, 0 })
+		end
+	end)
+end
+
+function M.move_to_bottom()
+	local todo_idx = safe_get_todo_idx()
+	if todo_idx == nil then
+		return
+	end
+
+	if todo_idx == #state.todos then
+		vim.notify("Task is already at the bottom!", vim.log.levels.INFO)
+	end
+
+	with_render(function()
+		local todo = table.remove(state.todos, todo_idx)
+		table.insert(state.todos, todo)
+
+		file.save_todos()
+	end)
+
+	vim.schedule(function()
+		if state.floats.body.win and api.nvim_win_is_valid(state.floats.body.win) then
+			local render = require("needdis.render")
+
+			local last_idx = #state.todos
+			local items = render.get_items_with_details()
+			for mark_id, details in pairs(items) do
+				if details.idx == last_idx then
+					local marks =
+						api.nvim_buf_get_extmarks(state.floats.body.buf, render.namespace, mark_id, mark_id, {})
+					if marks[1] then
+						local row = marks[1][2]
+						api.nvim_win_set_cursor(state.floats.body.win, { row + 1, 0 })
+					end
+				end
+			end
+		end
+	end)
+end
+
 return M

@@ -3,6 +3,7 @@
 Another neovim plugin that does tracking of your personal tasks.
 
 ## Reasoning
+
 I tried multiple apps for tracking my tasks - Microsoft ToDo, Obsidian etc. Every one of them needed me to leave the terminal and I do not want that. I want to be able to do it in program that I use the most - neovim.
 So I did nvim plugin to handle that for me.
 
@@ -13,6 +14,7 @@ So I did nvim plugin to handle that for me.
 ## Installation
 
 Lazy:
+
 ```lua
 return { "ochcaroline/needdis.nvim" }
 ```
@@ -20,22 +22,28 @@ return { "ochcaroline/needdis.nvim" }
 ## Usage
 
 ### Global keymaps
+
 | Keymap       | Action                                   |
-|--------------|------------------------------------------|
+| ------------ | ---------------------------------------- |
 | `<leader>at` | Toggle view of all tasks (toggle window) |
 
 ### TODO window keymaps
-| Keymap       	| Action                 	|
-|---------------|------------------------	|
-| `<CR>`    	| Toggle task details       |
-| `<leader>ta` 	| Add task               	|
-| `<leader>td` 	| Delete task            	|
-| `<leader>tv` 	| Toggle task completion 	|
-| `<leader>tet`	| Change task title         |
-| `<leader>ted`	| Change task description   |
+
+| Keymap        | Action                  |
+| ------------- | ----------------------- |
+| `<CR>`        | Toggle task details     |
+| `<leader>ta`  | Add task                |
+| `<leader>td`  | Delete task             |
+| `<leader>tv`  | Toggle task completion  |
+| `<leader>tet` | Change task title       |
+| `<leader>ted` | Change task description |
+| `<leader>tt`  | Move task to top        |
+| `<leader>tb`  | Move task to bottom     |
 
 ## Configuration
+
 Default configuration:
+
 ```lua
 {
 	save_path = vim.fn.stdpath("data") .. "/needdis.json",
@@ -47,6 +55,8 @@ Default configuration:
 		toggle_details = "<CR>",
 		edit_title = "<leader>tet",
 		edit_description = "<leader>ted",
+		move_to_top = "<leader>tt",
+		move_to_bottom = "<leader>tb",
 	},
 	icons = {
 		done = "✓",

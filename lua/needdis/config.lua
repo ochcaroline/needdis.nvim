@@ -10,6 +10,8 @@ M.defaults = {
 		toggle_details = "<CR>",
 		edit_title = "<leader>tet",
 		edit_description = "<leader>ted",
+		move_to_top = "<leader>tt",
+		move_to_bottom = "<leader>tb",
 	},
 	icons = {
 		done = "✓",

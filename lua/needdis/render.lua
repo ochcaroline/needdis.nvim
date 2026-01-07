@@ -166,6 +166,31 @@ local function ensure_window(existing, cfg, enter)
 	end
 end
 
+local function setup_keymaps()
+	utils.set_keymap("n", config.options.keymaps.add_todo, function()
+		actions.new_todo()
+		M.render_todos()
+	end)
+	utils.set_keymap("n", config.options.keymaps.delete_todo, function()
+		actions.delete_todo()
+		M.render_todos()
+	end)
+	utils.set_keymap("n", config.options.keymaps.toggle_completed, function()
+		actions.action_after_set_cursor(actions.toggle_todo)
+	end)
+	utils.set_keymap("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
+	utils.set_keymap("n", config.options.keymaps.edit_title, function()
+		actions.action_after_set_cursor(actions.edit_title)
+	end)
+	utils.set_keymap("n", config.options.keymaps.edit_description, function()
+		actions.action_after_set_cursor(actions.edit_description)
+	end)
+	utils.set_keymap("n", config.options.keymaps.move_to_top, actions.move_to_top)
+	utils.set_keymap("n", config.options.keymaps.move_to_bottom, actions.move_to_bottom)
+
+	vim.keymap.set("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
+end
+
 function M.render_todos()
 	items_with_details = {}
 	local windows_config = get_window_config()
@@ -256,26 +281,7 @@ function M.render_todos()
 		vim.api.nvim_set_option_value("buftype", "nofile", { buf = float.buf })
 	end)
 
-	utils.set_keymap("n", config.options.keymaps.add_todo, function()
-		actions.new_todo()
-		M.render_todos()
-	end)
-	utils.set_keymap("n", config.options.keymaps.delete_todo, function()
-		actions.delete_todo()
-		M.render_todos()
-	end)
-	utils.set_keymap("n", config.options.keymaps.toggle_completed, function()
-		actions.action_after_set_cursor(actions.toggle_todo)
-	end)
-	utils.set_keymap("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
-	utils.set_keymap("n", config.options.keymaps.edit_title, function()
-		actions.action_after_set_cursor(actions.edit_title)
-	end)
-	utils.set_keymap("n", config.options.keymaps.edit_description, function()
-		actions.action_after_set_cursor(actions.edit_description)
-	end)
-
-	vim.keymap.set("n", config.options.keymaps.toggle_details, M.toggle_details_on_todo)
+	setup_keymaps()
 
 	vim.api.nvim_create_autocmd("BufLeave", {
 		buffer = state.floats.body.buf,
