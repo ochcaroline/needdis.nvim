@@ -284,12 +284,30 @@ function M.render_todos()
 
 	setup_keymaps()
 
-	vim.api.nvim_create_autocmd("BufLeave", {
+	api.nvim_create_autocmd("BufLeave", {
 		buffer = state.floats.body.buf,
 		callback = function()
 			foreach_float(function(_, float)
 				pcall(vim.api.nvim_win_close, float.win, true)
 			end)
+		end,
+	})
+
+	-- when window size is changed - resize the TODO list
+	-- sometimes though an additional action (like hjkl) is required to kick the event
+	api.nvim_create_autocmd({ "VimResized" }, {
+		group = api.nvim_create_augroup("needdis-size", {}),
+		callback = function()
+			if not api.nvim_win_is_valid(state.floats.body.win) or state.floats.body.win == nil then
+				return
+			end
+
+			local updated_config = get_window_config()
+			foreach_float(function(name, _)
+				api.nvim_win_set_config(state.floats.body.buf, updated_config[name])
+			end)
+
+			M.render_todos()
 		end,
 	})
 end

@@ -39,4 +39,13 @@ function M.get_title_from_line(line)
 	return M.strip(line:gsub(config.options.icons.done, ""))
 end
 
+---@param msg string
+---@param level vim.log.levels?
+function M.notify(msg, level)
+	if level == nil then
+		level = vim.log.levels.INFO
+	end
+	vim.notify(msg, level)
+end
+
 return M

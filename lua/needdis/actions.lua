@@ -5,6 +5,7 @@ local api = vim.api
 local file = require("needdis.file")
 local state = require("needdis.state")
 local config = require("needdis.config")
+local utils = require("needdis.utils")
 
 ---@param fn function
 local function with_render(fn)
@@ -84,6 +85,7 @@ function M.new_todo()
 
 		file.save_todos()
 	end)
+	utils.notify("New todo added!")
 end
 
 ---@return integer|nil
@@ -120,8 +122,8 @@ local function safe_get_todo_idx()
 end
 
 function M.delete_todo()
+	local todo_idx = safe_get_todo_idx()
 	with_render(function()
-		local todo_idx = safe_get_todo_idx()
 		if todo_idx == nil then
 			return
 		end
@@ -129,6 +131,7 @@ function M.delete_todo()
 		remove_todo(todo_idx)
 		file.save_todos()
 	end)
+	utils.notify(string.format("TODO #%s deleted!", todo_idx))
 end
 
 function M.toggle_todo()
@@ -159,6 +162,7 @@ function M.edit_title()
 			edit_todo_title(todo_idx, input)
 		end)
 	end)
+	utils.notify("Title changed!")
 end
 
 function M.edit_description()
@@ -176,6 +180,7 @@ function M.edit_description()
 			edit_todo_description(todo_idx, input)
 		end)
 	end)
+	vim.notify("Description changed!")
 end
 
 ---@param todo_idx integer
@@ -230,6 +235,8 @@ function M.move_to_top()
 			api.nvim_win_set_cursor(state.floats.body.win, { 2, 0 })
 		end
 	end)
+
+	utils.notify(string.format("TODO #%s moved to top!", todo_idx))
 end
 
 function M.move_to_bottom()
@@ -270,6 +277,7 @@ function M.move_to_bottom()
 			end
 		end
 	end)
+	utils.notify(string.format("TODO #%s moved to bottom!", todo_idx))
 end
 
 function M.move_todo_up()
@@ -314,4 +322,5 @@ function M.move_todo_down()
 		move_cursor_to_task(todo_idx + 1)
 	end)
 end
+
 return M
