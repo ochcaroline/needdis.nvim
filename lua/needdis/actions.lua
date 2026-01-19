@@ -24,13 +24,23 @@ end
 
 ---@param title string
 ---@param description string
-local function add_todo(title, description)
+---@param to_top boolean?
+local function add_todo(title, description, to_top)
+	if to_top == nil then
+		to_top = true
+	end
+
 	local todo = {
 		title = title,
 		completed = false,
 		description = description,
 	}
-	table.insert(state.todos, todo)
+
+	if to_top then
+		table.insert(state.todos, 1, todo)
+	else
+		table.insert(state.todos, todo)
+	end
 end
 
 ---@param todo_idx integer
