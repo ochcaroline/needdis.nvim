@@ -81,7 +81,7 @@ function M.new_todo()
 			end
 
 			vim.ui.input({ prompt = config.options.messages.new_description }, function(description)
-				add_todo(title, description or "")
+				add_todo(title, description or "", config.options.save_at_top)
 			end)
 
 			if M._winid and api.nvim_win_is_valid(M.state.floats.body.win) then
