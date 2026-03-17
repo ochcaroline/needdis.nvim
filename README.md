@@ -41,6 +41,7 @@ return { "ochcaroline/needdis.nvim" }
 | `<leader>tb`  | Move task to bottom         |
 | `<leader>tk`  | Move task one position up   |
 | `<leader>tj`  | Move task one position down |
+| `<leader>tcd` | Remove completed tasks      |
 
 ## Configuration
 
@@ -62,6 +63,7 @@ Default configuration:
 		move_to_bottom = "<leader>tb",
 		move_task_up = "<leader>tk",
 		move_task_down = "<leader>tj",
+		remove_completed = "<leader>tcd",
 	},
 	icons = {
 		done = "✓",

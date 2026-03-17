@@ -15,6 +15,7 @@ M.defaults = {
 		move_to_bottom = "<leader>tb",
 		move_task_up = "<leader>tk",
 		move_task_down = "<leader>tj",
+		remove_completed = "<leader>tcd",
 	},
 	icons = {
 		done = "✓",

@@ -43,6 +43,14 @@ local function add_todo(title, description, to_top)
 	end
 end
 
+local function remove_completed_todos()
+	for i = #state.todos, 1, -1 do
+		if state.todos[i].completed then
+			table.remove(state.todos, i)
+		end
+	end
+end
+
 ---@param todo_idx integer
 local function remove_todo(todo_idx)
 	if todo_idx and state.todos[todo_idx] then
@@ -96,6 +104,14 @@ function M.new_todo()
 		file.save_todos()
 	end)
 	utils.notify("New todo added!")
+end
+
+function M.remove_completed_todos()
+	with_render(function()
+		remove_completed_todos()
+		vim.notify("Completed TODOs removed!", vim.log.levels.INFO)
+		file.save_todos()
+	end)
 end
 
 ---@return integer|nil
