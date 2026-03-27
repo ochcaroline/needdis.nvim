@@ -200,6 +200,10 @@ function M.render_todos()
 	state.floats.header = ensure_window(state.floats.header, windows_config.header)
 	state.floats.body = ensure_window(state.floats.body, windows_config.body, true)
 
+	local line_numbers = config.options.line_numbers
+	vim.api.nvim_set_option_value("number", line_numbers, { win = state.floats.body.win })
+	vim.api.nvim_set_option_value("relativenumber", line_numbers, { win = state.floats.body.win })
+
 	foreach_float(function(_, float)
 		vim.api.nvim_set_option_value("modifiable", true, { buf = float.buf })
 	end)
@@ -268,6 +272,7 @@ function M.render_todos()
 				shown = false,
 				end_mark = nil,
 			}
+
 			if utils.is_done_task(line) then
 				vim.hl.range(state.floats.body.buf, M.namespace_hl, hl_name_done, { i - 1, 0 }, { i - 1, -1 })
 			end

@@ -51,6 +51,7 @@ Default configuration:
 {
 	save_path = vim.fn.stdpath("data") .. "/needdis.json",
 	save_at_top = true,
+	line_numbers = false,
 	keymaps = {
 		toggle_window = "<leader>at",
 		add_todo = "<leader>ta",
